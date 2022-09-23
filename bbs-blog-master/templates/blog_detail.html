@@ -169,3 +169,69 @@
 
     </script>
 {% endblock %}
+{% block guanzhuan %}
+<script src="/static/js/jquery-2.1.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var b ={{request.session.user_info.nid}}
+        var input = {b};
+        $.ajax({
+            url: '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html',
+            type: 'POST',
+            data: input,
+            dataType: 'json',
+            success: function (msg) {
+                if (msg.status) {
+                    location.href = '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html';
+                } else {
+                    alert(msg.message);
+                }
+            }
+        })
+
+    });
+        $("a[name='guanzhu']").click(function () {
+            var v = $(this).attr('class');
+            var input_dic = {};
+            input_dic['guanzhu'] = v;
+           location.reload()
+
+            console.log(input_dic);
+            $.ajax({
+                url: '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html',
+                type: 'POST',
+                data: input_dic,
+                dataType: 'json',
+                success: function (msg) {
+                    if (msg.status) {
+                        location.href = '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html';
+                    } else {
+                        alert(msg.message);
+                    }
+                }
+            })
+
+        });
+        $("a[name='quxiaoguanzhu']").click(function () {
+            var v = $(this).attr('class');
+            var input_dic = {};
+            input_dic['quxiao'] = v;
+            console.log(input_dic);
+            $.ajax({
+                url: '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html',
+                type: 'POST',
+                data: input_dic,
+                dataType: 'json',
+                success: function (msg) {
+                    if (msg.status) {
+                        location.href = '/mainblog/{{ blog.site }}/{{ article.articledetail.article_id }}.html';
+                    } else {
+                        alert(msg.message);
+                    }
+                }
+            })
+
+         });
+
+</script>
+{% endblock %}

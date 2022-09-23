@@ -34,6 +34,7 @@ def index(request, *args, **kwargs):
     page_obj = Pagination(request.GET.get('p'), data_count)
     sql_ret = exc_sql(sql)
     article_list = sql_ret[page_obj.start:page_obj.end]
+    print(article_list)
     page_str = page_obj.page_str(base_url)
 
     pinglun = """select a.nid,a.title,c.username from mainmodels_article a, mainmodels_blog b, mainmodels_userinfo c
@@ -48,6 +49,7 @@ def index(request, *args, **kwargs):
     if request.POST:
         msg = {'status': False, 'message': None}
         val = request.POST.get('class')
+        print(val)
         f = {}
         f['article_id'] = val.split(' ')[1]
         f['user_id'] = val.split(' ')[0]

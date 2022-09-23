@@ -28,13 +28,13 @@ class Migration(migrations.Migration):
                 ('article_type_id', models.IntegerField(choices=[(1, 'Python'), (2, 'Linux'), (3, 'OpenStack'), (4, 'GoLang')], default=None)),
             ],
         ),
-        migrations.CreateModel(
-            name='Article2Tag',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mainmodels.Article', verbose_name='文章')),
-            ],
-        ),
+        # migrations.CreateModel(
+        #     name='Article2Tag',
+        #     fields=[
+        #         ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mainmodels.Article', verbose_name='文章')),
+        #     ],
+        # ),
         migrations.CreateModel(
             name='ArticleDetail',
             fields=[
@@ -130,11 +130,11 @@ class Migration(migrations.Migration):
             name='user',
             field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='mainmodels.UserInfo'),
         ),
-        migrations.AddField(
-            model_name='article2tag',
-            name='tag',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mainmodels.Tag', verbose_name='标签'),
-        ),
+        # migrations.AddField(
+        #     model_name='article2tag',
+        #     name='tag',
+        #     field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mainmodels.Tag', verbose_name='标签'),
+        # ),
         migrations.AddField(
             model_name='article',
             name='blog',
@@ -158,8 +158,8 @@ class Migration(migrations.Migration):
             name='updown',
             unique_together=set([('article', 'user')]),
         ),
-        migrations.AlterUniqueTogether(
-            name='article2tag',
-            unique_together=set([('article', 'tag')]),
-        ),
+        # migrations.AlterUniqueTogether(
+        #     name='article2tag',
+        #     unique_together=set([('article', 'tag')]),
+        # ),
     ]

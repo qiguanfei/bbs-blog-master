@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 class UserInfo(models.Model):
     """
     用户表
@@ -19,8 +20,6 @@ class UserInfo(models.Model):
                                   through='UserFans',
                                   related_name='f',
                                   through_fields=('user', 'follower'))
-
-
 class Blog(models.Model):
     """
     博客信息
@@ -36,8 +35,8 @@ class UserFans(models.Model):
     """
     互粉关系表
     """
-    user = models.ForeignKey(verbose_name='博主', to='UserInfo', to_field='nid', related_name='users')
-    follower = models.ForeignKey(verbose_name='粉丝', to='UserInfo', to_field='nid', related_name='followers')
+    user = models.ForeignKey(verbose_name='博主', to='UserInfo', to_field='nid', related_name='users',null=True)
+    follower = models.ForeignKey(verbose_name='粉丝', to='UserInfo', to_field='nid', related_name='followers',null=True)
 
     class Meta:
         unique_together = [

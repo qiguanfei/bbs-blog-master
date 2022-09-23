@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, HttpResponse
 from auth.views import check_login
-from mainmodels.models import UserInfo, Blog, Tag, Category, Article, Comment, UpDown
+from mainmodels.models import UserInfo, Blog, Tag, Category, Article, Comment, UpDown, UserFans
 import json
 from utils.excsql import exc_sql
 import datetime
 from utils import comment_tree
+
+add = 0
 
 
 @check_login
@@ -15,22 +17,65 @@ def index(request, site):
     :param site: 博主的网站后缀如：http://xxx.com/wupeiqi.html
     :return:
     """
+
     blog = Blog.objects.filter(site=site).select_related('user').first()
+
     if not blog:
         return redirect('/')
     tag_list = Tag.objects.filter(blog=blog)
-    category_list =Category.objects.filter(blog=blog)
+    category_list = Category.objects.filter(blog=blog)
     blog_id = Blog.objects.filter(site=site).values_list('nid')
+    blog_nid = UserInfo.objects.get(nid=blog_id)
+
     query = """select nid, count(nid) as num,strftime("%Y-%m",create_time) as ctime from mainmodels_article
                     where blog_id={}  group by strftime("%Y-%m",create_time)""".format(blog_id[0][0])
     date_list = exc_sql(query)
 
     article_list = Article.objects.filter(blog=blog).order_by('-nid').all()
 
+    # 处理关注
+    if request.POST.get('guanzhu'):
+        msg = {'status': False, 'message': None}
+        val = request.POST.get('guanzhu')
+        print(val)
+        a = val.split(' ')[0]
+        b = val.split(' ')[1]
+        print(a, b)
+        # 18
+        me = UserInfo.objects.get(nid=b)
+        zuozhe = UserInfo.objects.get(nid=a)
+        obj = UserFans(user=zuozhe, follower=me)
+        obj.save()
+        msg['status'] = True
+        return HttpResponse(json.dumps(msg))
+    elif request.POST.get('b'):
+        user_id = request.POST.get('b')
+        zhuozhe = UserInfo.objects.filter(nid=user_id)[0]
+        me = UserInfo.objects.filter(nid=blog_nid.nid)[0]
+        if UserFans.objects.filter(user=me, follower=zhuozhe).exists():
+            global add
+            add = 18
+    elif request.POST.get('quxiao'):
+        msg = {'status': False, 'message': None}
+        val = request.POST.get('quxiao')
+        print(val)
+        a = val.split(' ')[0]
+        b = val.split(' ')[1]
+        print(a, b)
+        me = UserInfo.objects.get(nid=b)
+        zuozhe = UserInfo.objects.get(nid=a)
+        print(me)
+        obj = UserFans.objects.filter(user=zuozhe, follower=me)[0].delete()
+        print(obj)
+        add = 0
+        msg['status'] = True
+        return HttpResponse(json.dumps(msg))
+
     return render(
         request,
         'blog_index.html',
         {
+            'add': add,
             'blog': blog,
             'tag_list': tag_list,
             'category_list': category_list,
@@ -68,10 +113,12 @@ def article_detail(req, site, article_id):
                     where a.article_id = {} and b.nid = a.user_id  """.format(article_id)
     comment_list = exc_sql(comment_q)
     comment_dict = comment_tree.build_tree(comment_list)
+    blog_nid = UserInfo.objects.get(nid=blog_id)
     # comment_dict = comment_tree.build_tree(comment_list)
     # print(comment_dict)
     if req.POST:
         # 处理点赞
+        print(req)
         if req.POST.get('class'):
             val = req.POST.get('class')
             msg = {'status': False, 'message': None}
@@ -94,6 +141,39 @@ def article_detail(req, site, article_id):
             msg['status'] = True
             return HttpResponse(json.dumps(msg))
         # 处理点赞 --end--
+        #处理关注
+        if req.POST.get('guanzhu'):
+            msg = {'status': False, 'message': None}
+            val = req.POST.get('guanzhu')
+            print(val)
+            a = val.split(' ')[0]
+            b = val.split(' ')[1]
+            print(a, b)
+            # 18
+            me = UserInfo.objects.get(nid=b)
+            zuozhe = UserInfo.objects.get(nid=a)
+            obj = UserFans(user=zuozhe, follower=me)
+            obj.save()
+            msg['status'] = True
+            return HttpResponse(json.dumps(msg))
+        elif req.POST.get('b'):
+            user_id = req.POST.get('b')
+            zhuozhe = UserInfo.objects.filter(nid=user_id)[0]
+            me = UserInfo.objects.filter(nid=blog_nid.nid)[0]
+            if UserFans.objects.filter(user=me, follower=zhuozhe).exists():
+                global add
+                add = 18
+        elif req.POST.get('quxiao'):
+            msg = {'status': False, 'message': None}
+            val = req.POST.get('quxiao')
+            a = val.split(' ')[0]
+            b = val.split(' ')[1]
+            me = UserInfo.objects.get(nid=b)
+            zuozhe = UserInfo.objects.get(nid=a)
+            obj = UserFans.objects.filter(user=zuozhe, follower=me)[0].delete()
+            add = 0
+            msg['status'] = True
+            return HttpResponse(json.dumps(msg))
         # 处理回复
         elif req.POST.get('textarea'):
             msg = {'status': False, 'message': None}
@@ -106,19 +186,21 @@ def article_detail(req, site, article_id):
                 reply_comm_id = int(req.POST.get('recontent'))
                 reply_user_id = Comment.objects.filter(nid=reply_comm_id).values_list('user_id')
                 Comment.objects.create(content=content, create_time=now, article_id=article_id,
-                                       user_id=user_id[0][0], reply_id=reply_comm_id,reply_user_id=reply_user_id[0][0])
+                                       user_id=user_id[0][0], reply_id=reply_comm_id, reply_user_id=reply_user_id[0][0])
                 msg['status'] = True
                 return HttpResponse(json.dumps(msg))
             else:
                 content = req.POST.get('textarea')
-                Comment.objects.create(content=content,create_time=now,article_id=article_id,user_id=user_id[0][0])
+                Comment.objects.create(content=content, create_time=now, article_id=article_id, user_id=user_id[0][0])
                 msg['status'] = True
                 return HttpResponse(json.dumps(msg))
-            # 处理回复 --end--
+        # 处理回复 --end--
+
     return render(
         req,
         'blog_detail.html',
         {
+            'add':add,
             'blog': blog,
             'article': article,
             'comment_dict': comment_dict,

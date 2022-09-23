@@ -92,25 +92,27 @@
     <script src="/static/js/jquery-2.1.4.min.js"></script>
     <script>
 
-        $("a[name='up']").click(function(){
-            var v = $(this).attr('class');
-            var input_dic = {};
-            input_dic['class'] = v;
-            console.log(input_dic);
-            $.ajax({
-            url:'/mainbbs/bbs_index.html',
-            type:'POST',
-            data:input_dic,
-            dataType: 'json',
-            success: function (msg) {
-                if(msg.status){
-                    location.href = '/mainbbs/bbs_index.html'
-                }else{
-                    alert(msg.message);
+        $("a[name='up']").click(function() {
+            console.log(this);
+                var v = $(this).attr('class');
+                            console.log(v);
+                var input_dic = {};
+                input_dic['class'] = v;
+                console.log(input_dic);
+                $.ajax({
+                url:'/mainbbs/bbs_index.html',
+                type:'POST',
+                data:input_dic,
+                dataType: 'json',
+                success: function (msg) {
+                    if(msg.status){
+                        location.href = '/mainbbs/bbs_index.html'
+                    }else{
+                        alert(msg.message);
+                    }
                 }
-            }
-            })
-        });
+                })
+             });
 
     </script>
 </body>

@@ -71,6 +71,7 @@
                 var n = $(this).attr('name');
                 input_dic[n] = v;
             });
+            console.log(input_dic)
             $.ajax({
                 url:'/mainadmin/edit_tag.html',
                 type:'POST',

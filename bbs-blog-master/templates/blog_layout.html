@@ -40,7 +40,7 @@
                     <li>关注：{{ blog.user.f.count }}</li>
                     <li>邮箱：{{ blog.user.email }}</li>
                 </ul>
-
+                {% if request.session.user_info.nid !=  blog.user.nid %}
                 {% if add > 0 %}
                     <a name="quxiaoguanzhu" class="{{ blog.user.nid }} {{ request.session.user_info.nid }}">
                         <text>取消关注ta!</text>
@@ -50,10 +50,11 @@
                     {% csrf_token %}
 
                     <a name="guanzhu" class="{{ blog.user.nid }} {{ request.session.user_info.nid }}">
-                        <text>关注ta!</text>
+                        <text> 双击关注ta!</text>
                         <i class="fa fa-heart-o" aria-hidden="true"></i>
                     </a>
                 {% endif %}
+            {% endif %}
                 <div class="memo">
                     心忧柴米油盐，不忘仰望星空。
                 </div>

@@ -25,7 +25,7 @@ def index(request, site):
     tag_list = Tag.objects.filter(blog=blog)
     category_list = Category.objects.filter(blog=blog)
     blog_id = Blog.objects.filter(site=site).values_list('nid')
-    blog_nid = UserInfo.objects.get(nid=blog_id)
+    blog_nid = UserInfo.objects.get(nid=blog.user.nid)
 
     query = """select nid, count(nid) as num,strftime("%Y-%m",create_time) as ctime from mainmodels_article
                     where blog_id={}  group by strftime("%Y-%m",create_time)""".format(blog_id[0][0])
@@ -101,6 +101,7 @@ def article_detail(req, site, article_id):
         flag = False
     tag_list = Tag.objects.filter(blog=blog)
     category_list = Category.objects.filter(blog=blog)
+
     query = """select nid, count(nid) as num,strftime("%Y-%m",create_time) as ctime from mainmodels_article
                 where blog_id={}  group by strftime("%Y-%m",create_time)""".format(blog_id[0][0])
     date_list = exc_sql(query)
@@ -113,7 +114,7 @@ def article_detail(req, site, article_id):
                     where a.article_id = {} and b.nid = a.user_id  """.format(article_id)
     comment_list = exc_sql(comment_q)
     comment_dict = comment_tree.build_tree(comment_list)
-    blog_nid = UserInfo.objects.get(nid=blog_id)
+    blog_nid = UserInfo.objects.get(nid=blog.user.nid)
     # comment_dict = comment_tree.build_tree(comment_list)
     # print(comment_dict)
     if req.POST:

@@ -162,11 +162,13 @@ def update_category(req, nid):
 @check_login
 def edit_tag(req):
     msg = {'status': False, 'message': None}
+    print(req.session.get('user_info'))
     blog_id = req.session.get('user_info')['blog__nid']
     ret = Tag.objects.filter(blog_id=blog_id)
     site = req.session.get('user_info')['blog__site']
     if req.POST:
         title = req.POST.get('title')
+        print(blog_id)
         if title and blog_id:  # 添加数据
             Tag.objects.create(title=title, blog_id=blog_id)
             msg['status'] = True
